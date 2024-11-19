@@ -1,4 +1,5 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Header, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { FilesService } from './files.service';
 import { IFile } from './interfaces/file.interface';
 
@@ -18,7 +19,11 @@ export class FilesController {
   }
 
   @Get('download-state')
-  getState(): IFile[] {
-    return this.filesService.getState();
+  @Header('Content-Type', 'application/json')
+  @Header('Content-Disposition', 'attachment; filename=state.json')
+  async downloadState(@Res() res: Response): Promise<void> {
+    const state = this.filesService.getState();
+    const stateJson = JSON.stringify(state, null, 2);
+    res.send(stateJson);
   }
 }
