@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { IFile } from './interfaces/file.interface';
 import * as fs from 'fs/promises';
 import { store } from '../store/store';
@@ -9,8 +10,8 @@ export class FilesService {
   private readonly logger = new Logger(FilesService.name);
   private readonly watchDirectory: string;
 
-  constructor() {
-    this.watchDirectory = './watched-files';
+  constructor(private configService: ConfigService) {
+    this.watchDirectory = this.configService.get<string>('watchDirectory');
   }
 
   async onApplicationBootstrap() {
