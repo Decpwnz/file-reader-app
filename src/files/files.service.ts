@@ -1,11 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { IFile } from './interfaces/file.interface';
 import * as fs from 'fs/promises';
+import { store } from '../store/store';
+import { setFiles, updateFileStatus } from '../store/filesSlice';
 
 @Injectable()
 export class FilesService {
   private readonly logger = new Logger(FilesService.name);
-  private state: IFile[] = [];
   private readonly watchDirectory: string;
 
   constructor() {
@@ -38,20 +39,26 @@ export class FilesService {
   }
 
   private updateState(newFiles: IFile[]): void {
-    this.state = this.state.map((existingFile) => ({
+    const currentState = store.getState().files.files;
+
+    const updatedState = currentState.map((existingFile) => ({
       ...existingFile,
       active: newFiles.some((newFile) => newFile.name === existingFile.name),
     }));
+    store.dispatch(updateFileStatus(updatedState));
 
-    const existingFileNames = this.state.map((file) => file.name);
+    const existingFileNames = updatedState.map((file) => file.name);
     const newFileEntries = newFiles.filter(
       (newFile) => !existingFileNames.includes(newFile.name),
     );
 
-    this.state = [...this.state, ...newFileEntries];
+    if (newFileEntries.length > 0) {
+      const finalState = [...updatedState, ...newFileEntries];
+      store.dispatch(setFiles(finalState));
+    }
   }
 
   getState(): IFile[] {
-    return this.state;
+    return store.getState().files.files;
   }
 }
