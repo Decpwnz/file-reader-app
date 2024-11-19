@@ -70,11 +70,11 @@ Accessing http://127.0.0.1:3000/download-state API directly in the browser will 
 ```json
 [
   {
-    "name": "file_name.jpg",
+    "name": "File_name.jpg",
     "active": true
   },
   {
-    "name": "file_name2.jpg",
+    "name": "File_name2.jpg",
     "active": false
   }
 ]
