@@ -34,7 +34,7 @@ export class FilesService {
       this.updateState(newState);
     } catch (error) {
       this.logger.error(`Error scanning directory: ${error.message}`);
-      throw error;
+      throw new Error(`Failed to scan directory: ${error.message}`);
     }
   }
 
